@@ -1,0 +1,158 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'maven-publish'
+    id 'signing'
+}
+
+task androidSpircesJar(type: Jar) {
+//    classifier = 'source'
+    archiveClassifier.set('source')
+    from android.sourceSets.main.java.srcDirs
+}
+
+task androidJavadocs(type: Javadoc) {
+    failOnError = false
+    source = android.sourceSets.main.java.srcDirs
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion},"
+    classpath += files(ext.androidJar)
+
+}
+
+artifacts {
+    archives androidSpircesJar
+}
+afterEvaluate {
+    publishing {
+        publications {
+            //creates a maven publication called release
+            release(MavenPublication) {
+                description = 'this is test'
+                groupId 'io.github.574996894'
+                artifactId 'Start-library'
+                version '0.0.1'
+                pom {
+                    name = "start-library"
+                    description = 'start library'
+                    url = 'https://github.com/574996894/printStart'
+                    inceptionYear = '2023'
+
+
+                    scm {
+                        url = 'https://github.com/574996894/printStart'
+                        connection = 'scm:git@https://github.com/574996894/printStart'
+                        developerConnection = 'scm:git@https://github.com/574996894/printStart'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution = 'repo'
+                            comments = 'A business-friendly OSS license'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = '574996894'
+                            name = 'leibniz'
+                            email = 'leibniz57499outlook.com'
+                            url = 'https://github.com/574996894/printStart'
+                        }
+                    }
+                }
+//
+//                issueManagement {
+//                    system = 'Github'
+//                    url = 'https://github.com/574996894/printStart'
+//                }
+//                artifact androidSpircesJar //需要上传的source jar
+//                artifact "F:\\WorkPlace\\start\\printStart.doc" //需要上传的java doc
+//                artifact "F:\\WorkPlace\\start\\printStart.jar" //需要上传的资源jar路径或者是aar路径，这边可以填写一个生成jar的task，如makeJar方法就是一个生成jar的task
+            }
+        }
+        repositories {
+            maven {
+                name = 'nexus'
+                allowInsecureProtocol true
+                // 指定要上传的maven仓库
+                url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                //Maven仓库用户名和密码
+                credentials {
+                    username 'Leibniz'
+                    password 'Bjhyn2008.net'
+                }
+            }
+        }
+    }
+    signing {
+        sign publishing.publications.release //签名配置
+    }
+}
+
+
+//uploadArchives {
+//    repositories.mavenDeployer {
+//        name = 'mavenCentralMavenDeployer'
+//    }
+//    repository(url: MAVEN_URL) {
+//
+//    }
+//}
+
+android {
+    namespace 'com.light_mountain.start_library'
+    compileSdk 32
+
+    defaultConfig {
+        applicationId "com.light_mountain.start_library"
+        minSdk 28
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    packagingOptions {
+        exclude 'META-INF/gradle/incremental.annotation.processors'
+    }
+
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+
+
+}
